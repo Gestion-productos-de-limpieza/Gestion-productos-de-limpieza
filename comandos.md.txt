@@ -1,0 +1,25 @@
+# Comandos Git
+
+## Clonar repositorio
+git clone <URL>
+
+## Ubicarse en development
+git checkout development
+
+## Traer cambios
+git pull origin development
+
+## Crear rama por caso de uso
+git checkout -b nombre-caso-de-uso
+
+## Ver estado
+git status
+
+## Agregar cambios
+git add .
+
+## Guardar cambios
+git commit -m "descripción de lo que hice"
+
+## Subir cambios
+git push origin nombre-rama
