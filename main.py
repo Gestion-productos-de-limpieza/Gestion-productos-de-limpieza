@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+app = FastAPI(title="Gestión Productos de Limpieza")
 
 @app.get("/")
 def root():
-    return {"message": "Hola mundo"}
+    return {"mensaje": "API funcionando correctamente"}
