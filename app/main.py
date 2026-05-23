@@ -1,10 +1,13 @@
 from fastapi import FastAPI
-# Importamos tu router de productos
-from app.api.productosapi import router as products_router
+from app.api.productosapi import router as productos_router
 
-app = FastAPI(title="Gestion-productos-de-limpieza")
+app = FastAPI(
+    title="Gestion-productos-de-limpieza",
+    version="1.0.0",
+)
 
-# Mantenemos lo que hizo tu compañero
+app.include_router(productos_router)
+
 @app.get("/")
 def root():
     return {"message": "Servidor funcionando correctamente"}
@@ -17,6 +20,6 @@ def health():
         "environment": "development"
     }
 
-# --- AGREGAMOS TU TRABAJO AQUÍ ---
-# Esto conecta tus capas de Productos a la API
-app.include_router(products_router)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
