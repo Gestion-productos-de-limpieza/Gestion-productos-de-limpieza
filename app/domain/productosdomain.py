@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+HEAD
 from pydantic import BaseModel
 from typing import Optional
 
@@ -16,7 +16,7 @@ class ProductoResponse(ProductoCreate):
 
     class Config:
         from_attributes = True
-=======
+
 # ─────────────────────────────────────────────────────────────
 # CAPA DOMINIO — define la entidad y sus reglas de negocio
 # No importa nada de FastAPI ni de base de datos aquí.
@@ -90,4 +90,4 @@ class Producto:
             "categoria":  self.categoria,
             "disponible": self.stock > 0,
         }
->>>>>>> 471d81c27512cdc26a851e3e46e5b9d60df19266
+
