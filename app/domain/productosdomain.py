@@ -1,4 +1,3 @@
-HEAD
 from pydantic import BaseModel
 from typing import Optional
 
@@ -90,4 +89,3 @@ class Producto:
             "categoria":  self.categoria,
             "disponible": self.stock > 0,
         }
-
