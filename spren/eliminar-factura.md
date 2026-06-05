@@ -1,4 +1,4 @@
-# HU-XXX: Eliminar Factura
+# HU-10: Eliminar Factura
 
 ## 📖 Historia de Usuario
 Como **administrador del sistema**,

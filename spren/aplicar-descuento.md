@@ -1,4 +1,4 @@
-# HU-XXX: Aplicar Descuento
+# HU-13: Aplicar Descuento
 
 ## 📖 Historia de Usuario
 Como **sistema de ventas**,

@@ -1,4 +1,4 @@
-# HU-XXX: Listar Facturas
+# HU-07: Listar Facturas
 
 ## 📖 Historia de Usuario
 Como **administrador del sistema**,

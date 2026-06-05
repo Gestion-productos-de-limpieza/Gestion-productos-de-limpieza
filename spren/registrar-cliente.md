@@ -1,4 +1,4 @@
-# HU-XXX: Registrar Cliente
+# HU-04: Registrar Cliente
 
 ## 📖 Historia de Usuario
 Como **administrador o vendedor del sistema**,

@@ -1,5 +1,4 @@
-HU-027: Registrar Usuario
-
+# HU-01: Registrar Usuario
 📖 Historia de Usuario
 
 Como Administrador o Cliente,

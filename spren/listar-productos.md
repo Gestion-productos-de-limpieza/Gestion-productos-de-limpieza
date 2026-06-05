@@ -1,4 +1,4 @@
-# HU-XXX: Listar Productos
+# HU-06: Listar Productos
 
 ## 📖 Historia de Usuario
 Como **administrador o vendedor del sistema**,

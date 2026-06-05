@@ -1,4 +1,4 @@
-# HU-XXX: Listar Usuarios
+# HU-05: Listar Usuarios
 
 ## 📖 Historia de Usuario
 Como **administrador del sistema**,

@@ -1,4 +1,4 @@
-# HU-XXX: Registrar Factura
+# HU-03: Registrar Factura
 
 ## 📖 Historia de Usuario
 Como **administrador o vendedor del sistema**,

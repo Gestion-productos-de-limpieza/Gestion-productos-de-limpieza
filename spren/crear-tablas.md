@@ -1,5 +1,4 @@
-HU-XXX: Crear Tablas en Base de Datos
-
+# HU-12: Crear Tablas
 📖 Historia de Usuario
 
 Como desarrollador del sistema,

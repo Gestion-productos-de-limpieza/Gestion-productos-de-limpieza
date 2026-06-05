@@ -1,4 +1,4 @@
-# HU-XXX: Definir Roles
+# HU-11: Definir Roles
 
 ## 📖 Historia de Usuario
 Como **administrador del sistema**,

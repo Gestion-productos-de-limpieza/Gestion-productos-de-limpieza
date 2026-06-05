@@ -1,4 +1,4 @@
-# HU-XXX: Eliminar Usuario
+# HU-09: Eliminar Usuario
 
 ## 📖 Historia de Usuario
 Como **administrador del sistema**,

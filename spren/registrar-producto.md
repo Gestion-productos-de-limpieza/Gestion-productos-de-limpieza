@@ -1,4 +1,4 @@
-# HU-XXX: Registrar Producto
+# HU-02: Registrar Producto
 
 ## 📖 Historia de Usuario
 Como **administrador del sistema**,
