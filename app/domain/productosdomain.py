@@ -1,67 +1,39 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional
 
-# ── Modelo para CREAR (lo que recibe la API) ──
 class ProductoCreate(BaseModel):
-    name: str
-    description: str
-    price: float
-    stock: int
-    categoria: Optional[str] = "General"  # Agregado porque tu API tiene ruta de categoría
+    nombre:    str   = Field(..., min_length=2, description="Nombre del producto")
+    precio:    float = Field(..., gt=0,         description="Precio mayor a 0")
+    stock:     int   = Field(..., ge=0,         description="Stock no negativo")
+    categoria: str   = Field(..., min_length=2)
 
-# ── Modelo para RESPONDER (lo que devuelve la API) ──
-class ProductoResponse(ProductoCreate):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-# ─────────────────────────────────────────────────────────────
-# CAPA DOMINIO — define la entidad y sus reglas de negocio
-# No importa nada de FastAPI ni de base de datos aquí.
-# ─────────────────────────────────────────────────────────────
-
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional
-
-
-# ── Schema de ENTRADA (lo que recibe la API del cliente) ──────
-class ProductoCreate(BaseModel):
-    nombre:      str   = Field(..., min_length=2, description="Nombre del producto")
-    precio:      float = Field(..., gt=0,        description="Precio mayor a 0")
-    stock:       int   = Field(..., ge=0,        description="Stock no negativo")
-    categoria:   str   = Field(..., min_length=2)
-
-    # ── REGLA DE NEGOCIO: nombre no puede tener números ──────
     @field_validator("nombre")
     @classmethod
-    def nombre_sin_numeros(cls, v):
+    def nombre_sin_numeros(cls, v: str) -> str:
         if any(c.isdigit() for c in v):
             raise ValueError("El nombre no puede contener números")
         return v.strip().title()
 
-    # ── REGLA DE NEGOCIO: precio con dos decimales máximo ────
     @field_validator("precio")
     @classmethod
-    def precio_valido(cls, v):
+    def precio_valido(cls, v: float) -> float:
         return round(v, 2)
 
 
-# ── Schema de SALIDA (lo que devuelve la API al cliente) ──────
 class ProductoResponse(BaseModel):
-    id:          int
-    nombre:      str
-    precio:      float
-    stock:       int
-    categoria:   str
-    disponible:  bool  # calculado: stock > 0
+    id:         int
+    nombre:     str
+    precio:     float
+    stock:      int
+    categoria:  str
+    disponible: bool
 
-    class Config:
-        from_attributes = True
+    # Configuración correcta para Pydantic v2 (quitará el error rojo)
+    model_config = ConfigDict(from_attributes=True)
 
 
-# ── Modelo interno del dominio (la "entidad real") ────────────
 class Producto:
+    """Clase de entidad para lógica interna y base de datos"""
     def __init__(self, id: int, nombre: str, precio: float,
                  stock: int, categoria: str):
         self.id        = id
@@ -70,13 +42,12 @@ class Producto:
         self.stock     = stock
         self.categoria = categoria
 
-    # REGLA DE NEGOCIO: ¿hay stock suficiente?
     def tiene_stock(self, cantidad: int = 1) -> bool:
         return self.stock >= cantidad
 
-    # REGLA DE NEGOCIO: descuento solo si precio > 50.000
     def aplicar_descuento(self, porcentaje: float) -> float:
-        if self.precio < 50_000:
+        # Nota: La HU dice que el descuento aplica a compras mayores a $50.000
+        if self.precio < 50000:
             raise ValueError("Descuento solo aplica a precios mayores a $50.000")
         return round(self.precio * (1 - porcentaje / 100), 2)
 
