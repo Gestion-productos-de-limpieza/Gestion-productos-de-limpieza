@@ -28,3 +28,12 @@ class TokenData(BaseModel):
 
 class UsuarioInDB(Usuario):
     hashed_contrasena: str
+
+class UsuarioResponse(BaseModel):
+    id: int
+    correo: str
+    nombre: str
+    rol: str
+    estado: str
+
+    model_config = ConfigDict(from_attributes=True)
