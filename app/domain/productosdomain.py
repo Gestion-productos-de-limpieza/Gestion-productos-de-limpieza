@@ -61,7 +61,7 @@ class Producto:
             "categoria":  self.categoria,
             "disponible": self.stock > 0,
         }
-    
+
 from app.domain.usuariosdomain import Usuario
 from typing import Optional
 
@@ -98,4 +98,3 @@ class UsuariosRepositories:
 
 # Instancia única compartida
 usuario_repository = UsuariosRepositories()
-
