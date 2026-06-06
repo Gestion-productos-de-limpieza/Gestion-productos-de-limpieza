@@ -1,33 +1,32 @@
-# ─────────────────────────────────────────────────────────────
-# CAPA API — rutas HTTP con FastAPI
-# Solo recibe peticiones y llama al servicio.
-# Aquí NO hay lógica de negocio.
-# ─────────────────────────────────────────────────────────────
-
 from fastapi import APIRouter, HTTPException, status
 from app.domain.usuariosdomain import UsuarioCreate, UsuarioResponse
-from app.services.usuariosservices import usuarios_service
+from app.core.usuarioscore import obtener_hash_contrasena  # Importamos del Core
 
 router = APIRouter(
     prefix="/api/v1/users",
-    tags=["Usuarios"],
+    tags=["Usuarios"]
 )
 
+db_usuarios_temp = []
 
-# ── POST /api/v1/users/ ───────────────────────────────────────
-@router.post("/", response_model=UsuarioResponse,
-             status_code=status.HTTP_201_CREATED)
-def registrar_usuario(datos: UsuarioCreate):
-    try:
-        return usuarios_service.registrar(datos)
-    except ValueError as e:
-        mensaje = str(e)
-        if "ya está registrado" in mensaje:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail={"codigo": 409, "mensaje": mensaje}
-            )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"codigo": 400, "mensaje": mensaje}
-        )
+@router.post("/", response_model=UsuarioResponse, status_code=status.HTTP_201_CREATED)
+async def registrar_usuario(usuario: UsuarioCreate):
+    # 1. Verificar duplicados
+    for u in db_usuarios_temp:
+        if u.get("correo") == usuario.correo:
+            raise HTTPException(status_code=400, detail="El correo ya existe")
+    
+    # 2. Usar la función que está en el CORE
+    hashed_password = obtener_hash_contrasena(usuario.contrasena)
+    
+    # 3. Crear usuario
+    nuevo_usuario = {
+        "id": len(db_usuarios_temp) + 1,
+        "nombre": usuario.nombre,
+        "correo": usuario.correo,
+        "contrasena": hashed_password,
+        "rol": usuario.rol or "vendedor",
+        "estado": usuario.estado or "activo"
+    }
+    db_usuarios_temp.append(nuevo_usuario)
+    return nuevo_usuario
