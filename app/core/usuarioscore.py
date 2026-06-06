@@ -1,31 +1,42 @@
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
-from typing import Optional
+from fastapi import APIRouter, HTTPException, status
+from app.domain.usuariosdomain import UsuarioCreate, UsuarioResponse
+from app.core.usuarioscore import obtener_hash_contrasena  # IMPORTANTE: Conectamos con el Core
 
-# Configuración de seguridad (HU-028)
-SECRET_KEY = "tu_clave_secreta_super_segura_para_el_proyecto"  # Cambiar en producción
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+router = APIRouter(
+    prefix="/api/v1/users",
+    tags=["Usuarios"]
+)
 
-# Contexto para encriptar contraseñas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Base de datos temporal (luego usaremos Repositories)
+db_usuarios_temp = []
 
-def obtener_hash_contrasena(contrasena: str) -> str:
-    """Encripta la contraseña para guardarla de forma segura (HU-027)"""
-    return pwd_context.hash(contrasena)
-
-def verificar_contrasena(contrasena_plana: str, contrasena_hasheada: str) -> bool:
-    """Compara la contraseña ingresada con la guardada (HU-028)"""
-    return pwd_context.verify(contrasena_plana, contrasena_hasheada)
-
-def crear_token_acceso(data: dict, expires_delta: Optional[timedelta] = None):
-    """Genera el token JWT para el inicio de sesión exitoso (HU-028)"""
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+@router.post("/", response_model=UsuarioResponse, status_code=status.HTTP_201_CREATED)
+async def registrar_usuario(usuario: UsuarioCreate):
+    """
+    Endpoint para registrar un nuevo usuario (HU-01)
+    """
+    # 1. Verificar si el usuario ya existe por email
+    for u in db_usuarios_temp:
+        if u["email"] == usuario.email:
+            raise HTTPException(
+                status_code=400, 
+                detail="El correo electrónico ya está registrado"
+            )
+    
+    # 2. ENCRIPTAR LA CONTRASEÑA (Aquí usamos el Core)
+    hashed_password = obtener_hash_contrasena(usuario.password)
+    
+    # 3. Crear el nuevo usuario con la contraseña segura
+    nuevo_usuario = {
+        "id": len(db_usuarios_temp) + 1,
+        "username": usuario.username,
+        "email": usuario.email,
+        "password": hashed_password,  # Guardamos el hash, no la clave real
+        "rol": usuario.rol or "vendedor",
+        "activo": True
+    }
+    
+    db_usuarios_temp.append(nuevo_usuario)
+    
+    # 4. Retornar la respuesta (Pydantic filtrará la contraseña automáticamente)
+    return nuevo_usuario
