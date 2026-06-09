@@ -1,10 +1,10 @@
-# 🧴 CleanShop — Sistema de Gestión de Productos de Limpieza
+# CleanShop — Sistema de Gestión de Productos de Limpieza
 
 Aplicación web desarrollada con **Spring Boot**, **Thymeleaf** y **MySQL** para la gestión de una tienda de productos de limpieza. Permite administrar productos, categorías, clientes, ventas y pedidos con control de acceso por roles.
 
 ---
 
-## 👥 Integrantes
+## Integrantes
 
 | Nombre | Rol |
 |---|---|
@@ -13,7 +13,7 @@ Aplicación web desarrollada con **Spring Boot**, **Thymeleaf** y **MySQL** para
 
 ---
 
-## 🎯 Objetivos del Proyecto
+## Objetivos del Proyecto
 
 ### Objetivo General
 Desarrollar una aplicación web que permita gestionar eficientemente el inventario, ventas y clientes de una tienda de productos de limpieza, facilitando el control administrativo mediante una interfaz intuitiva y segura.
@@ -27,13 +27,13 @@ Desarrollar una aplicación web que permita gestionar eficientemente el inventar
 
 ---
 
-## 📋 Justificación
+## Justificación
 
 Las tiendas de productos de limpieza manejan un volumen considerable de inventario, clientes y transacciones que resulta difícil de controlar manualmente. La ausencia de un sistema centralizado genera errores en el registro de ventas, pérdida de información y dificultades para hacer seguimiento al inventario. Este proyecto busca digitalizar esos procesos mediante una aplicación web accesible, segura y fácil de usar, aplicando tecnologías del entorno empresarial actual como Spring Boot y MySQL.
 
 ---
 
-## 🛠️ Entorno de Trabajo
+## Entorno de Trabajo
 
 | Tecnología | Versión / Detalle |
 |---|---|
@@ -50,7 +50,7 @@ Las tiendas de productos de limpieza manejan un volumen considerable de inventar
 
 ---
 
-## ✅ Requerimientos Funcionales
+## Requerimientos Funcionales
 
 | ID | Requerimiento |
 |---|---|
@@ -67,7 +67,7 @@ Las tiendas de productos de limpieza manejan un volumen considerable de inventar
 
 ---
 
-## 🚫 Requerimientos No Funcionales
+## Requerimientos No Funcionales
 
 | ID | Requerimiento |
 |---|---|
@@ -81,7 +81,7 @@ Las tiendas de productos de limpieza manejan un volumen considerable de inventar
 
 ---
 
-## 🗄️ Base de Datos
+## Base de Datos
 
 ### Diagrama de Entidad-Relación (DER)
 
@@ -266,7 +266,7 @@ INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad, precio_unitario) V
 
 ---
 
-## 🚀 ¿Cómo ejecutar el proyecto?
+## ¿Cómo ejecutar el proyecto?
 
 ```bash
 # 1. Clonar el repositorio
@@ -288,7 +288,7 @@ Acceder en: `http://localhost:8080`
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 src/
