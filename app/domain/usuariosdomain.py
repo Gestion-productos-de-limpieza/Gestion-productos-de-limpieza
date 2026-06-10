@@ -34,7 +34,6 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     correo: Optional[str] = None
 
-<<<<<<< HEAD
 class Usuario:
     def __init__(self, id: int, nombre: str, correo: str,
                  contrasena: str, rol: str):
@@ -52,16 +51,3 @@ class Usuario:
             "rol":     self.rol,
             "mensaje": "Usuario registrado exitosamente",
         }
-=======
-class UsuarioInDB(Usuario):
-    hashed_contrasena: str
-
-class UsuarioResponse(BaseModel):
-    id: int
-    correo: str
-    nombre: str
-    rol: str
-    estado: str
-
-    model_config = ConfigDict(from_attributes=True)
->>>>>>> feat-modulo-productos
