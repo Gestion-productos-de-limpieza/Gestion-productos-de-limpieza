@@ -1,24 +1,20 @@
 
 from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, Field
 from typing import Optional
 
-class ProductoCreate(BaseModel):
-    nombre:    str   = Field(..., min_length=2, description="Nombre del producto")
-    precio:    float = Field(..., gt=0,         description="Precio mayor a 0")
-    stock:     int   = Field(..., ge=0,         description="Stock no negativo")
-    categoria: str   = Field(..., min_length=2)
+class ProductoBase(BaseModel):
+    nombre: str = Field(..., min_length=3, max_length=100)
+    descripcion: Optional[str] = None
+    precio: float = Field(..., gt=0)
+    stock: int = Field(..., ge=0)
+    categoria: str
 
-    @field_validator("nombre")
-    @classmethod
-    def nombre_sin_numeros(cls, v: str) -> str:
-        if any(c.isdigit() for c in v):
-            raise ValueError("El nombre no puede contener números")
-        return v.strip().title()
+class ProductoCreate(ProductoBase):
+    pass
 
-    @field_validator("precio")
-    @classmethod
-    def precio_valido(cls, v: float) -> float:
-        return round(v, 2)
+class ProductoResponse(ProductoBase):
+    id: int
 
 
 class ProductoResponse(BaseModel):
@@ -98,3 +94,6 @@ class UsuariosRepositories:
 
 # Instancia única compartida
 usuario_repository = UsuariosRepositories()
+    class Config:
+        from_attributes = True
+
