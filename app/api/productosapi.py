@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+﻿from fastapi import APIRouter, HTTPException, status
 from typing import List
 from app.domain.productosdomain import ProductoCreate, ProductoResponse
 from app.services.productosservices import productos_service
@@ -11,7 +11,10 @@ router = APIRouter(
 
 @router.get("/", response_model=List[ProductoResponse])
 def listar_productos():
-    return productos_service.listar()
+    try:
+        return productos_service.listar()
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
 @router.get("/{id}", response_model=ProductoResponse)
@@ -52,3 +55,5 @@ def por_categoria(categoria: str):
         return productos_service.por_categoria(categoria)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
