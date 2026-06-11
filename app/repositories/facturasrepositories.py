@@ -1,40 +1,42 @@
-from typing import List, Optional
-from datetime import date
-from app.domain.facturasdomain import FacturaInDB
+# ─────────────────────────────────────────────────────────────
+# CAPA REPOSITORIO — Persistencia en memoria
+# ─────────────────────────────────────────────────────────────
 
-class FacturaRepository:
-    def __init__(self, db_connection):
-        self.db_connection = db_connection # Placeholder para la conexión a la base de datos
-        self.facturas_db = [] # Simulación de base de datos en memoria
-        self.next_id = 1
+from app.domain.facturasdomain import FacturaEntidad
+from typing import Optional
 
-    async def create_factura(self, factura: FacturaInDB) -> FacturaInDB:
-        # Lógica para guardar la factura en la base de datos
-        factura.id_factura = self.next_id
-        self.next_id += 1
-        self.facturas_db.append(factura)
-        return factura
 
-    async def get_factura_by_id(self, factura_id: int) -> Optional[FacturaInDB]:
-        # Lógica para obtener una factura por ID de la base de datos
-        for factura in self.facturas_db:
-            if factura.id_factura == factura_id:
-                return factura
-        return None
+class FacturasRepositories:
 
-    async def get_all_facturas(self, fecha: Optional[date] = None, cliente_id: Optional[int] = None, estado: Optional[str] = None) -> List[FacturaInDB]:
-        # Lógica para obtener todas las facturas, opcionalmente filtradas
-        filtered_facturas = self.facturas_db
-        if fecha:
-            filtered_facturas = [f for f in filtered_facturas if f.fecha == fecha]
-        if cliente_id:
-            filtered_facturas = [f for f in filtered_facturas if f.cliente['id'] == cliente_id]
-        if estado:
-            filtered_facturas = [f for f in filtered_facturas if f.estado == estado]
-        return filtered_facturas
+    def __init__(self):
+        self._datos: list[FacturaEntidad] = []
+        self._siguiente_id: int = 1
 
-    async def delete_factura(self, factura_id: int) -> bool:
-        # Lógica para eliminar una factura de la base de datos
-        initial_len = len(self.facturas_db)
-        self.facturas_db = [f for f in self.facturas_db if f.id_factura != factura_id]
-        return len(self.facturas_db) < initial_len
+    def obtener_todos(self) -> list[FacturaEntidad]:
+        return self._datos.copy()
+
+    def obtener_por_id(self, id: int) -> Optional[FacturaEntidad]:
+        return next((f for f in self._datos if f.id == id), None)
+
+    def crear(self, cliente: str, total: float,
+              estado: str = "pendiente") -> FacturaEntidad:
+        nueva = FacturaEntidad(
+            id=self._siguiente_id,
+            cliente=cliente,
+            total=total,
+            estado=estado,
+        )
+        self._datos.append(nueva)
+        self._siguiente_id += 1
+        return nueva
+
+    def eliminar(self, id: int) -> bool:
+        factura = self.obtener_por_id(id)
+        if not factura:
+            return False
+        self._datos.remove(factura)
+        return True
+
+
+# ── INSTANCIA GLOBAL ──────────────────────────────────────────
+factura_repository = FacturasRepositories()

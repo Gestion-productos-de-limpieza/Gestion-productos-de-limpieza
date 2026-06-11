@@ -1,88 +1,52 @@
-from typing import List, Optional
-from datetime import date
+# ─────────────────────────────────────────────────────────────
+# CAPA SERVICIO — Lógica de negocio
+# ─────────────────────────────────────────────────────────────
 
-from app.domain.facturasdomain import FacturaCreate, FacturaResponse, FacturaInDB, ProductoFacturaResponse
-from app.repositories.facturasrepositories import FacturaRepository
-from app.services.clientesservices import ClienteService
-from app.services.productosservices import ProductoService
+from app.domain.facturasdomain import FacturaCreate, FacturaResponse, FacturaListItem
+from app.repositories.facturasrepositories import factura_repository
 
-class FacturaService:
-    def __init__(self, factura_repository: FacturaRepository, cliente_service: ClienteService, producto_service: ProductoService):
-        self.factura_repository = factura_repository
-        self.cliente_service = cliente_service
-        self.producto_service = producto_service
 
-    async def register_factura(self, factura_data: FacturaCreate) -> Optional[FacturaResponse]:
-        # HU-XXX: Registrar Factura
-        cliente = await self.cliente_service.get_cliente_by_id(factura_data.cliente_id)
-        if not cliente:
-            return None # Cliente no encontrado
+class FacturasServices:
 
-        productos_facturados = []
-        subtotal = 0.0
+    def __init__(self, repo):
+        self.repo = repo
 
-        for item in factura_data.productos:
-            producto = await self.producto_service.get_producto_by_id(item.producto_id)
-            if not producto:
-                return None # Producto no encontrado
-            if producto.cantidad < item.cantidad:
-                return None # Stock insuficiente
-            
-            # Actualizar stock (simulado, en un sistema real sería parte de la transacción)
-            await self.producto_service.update_producto_stock(item.producto_id, -item.cantidad)
-
-            productos_facturados.append(ProductoFacturaResponse(
-                id=producto.id,
-                nombre=producto.nombre,
-                cantidad=item.cantidad,
-                precio_unitario=producto.precio
-            ))
-            subtotal += producto.precio * item.cantidad
-
-        descuento_porcentaje = 0
-        descuento_valor = 0.0
-        total = subtotal
-
-        if cliente.tipo_cliente == "mayorista":
-            # Lógica de aplicación de descuento basada en HU-XXX_Aplicar_Descuento_v2.md
-            if subtotal >= 500000:
-                descuento_porcentaje = 25
-            elif subtotal >= 200000:
-                descuento_porcentaje = 20
-            elif subtotal >= 100000:
-                descuento_porcentaje = 15
-            elif subtotal >= 50000:
-                descuento_porcentaje = 10
-            
-            descuento_valor = subtotal * (descuento_porcentaje / 100)
-            total = subtotal - descuento_valor
-
-        factura_in_db = FacturaInDB(
-            id_factura=0, # Se asignará en el repositorio
-            cliente=cliente.model_dump(),
-            productos=[p.model_dump() for p in productos_facturados],
-            subtotal=subtotal,
-            descuento_porcentaje=descuento_porcentaje,
-            descuento_valor=descuento_valor,
-            total=total,
-            estado="pendiente",
-            fecha=date.today(),
-            mensaje="Factura registrada exitosamente"
+    def registrar(self, datos: FacturaCreate) -> FacturaResponse:
+        """Crea una nueva factura en estado pendiente."""
+        f = self.repo.crear(
+            cliente=datos.cliente,
+            total=datos.total,
+            estado=datos.estado or "pendiente"
         )
-        new_factura = await self.factura_repository.create_factura(factura_in_db)
-        return FacturaResponse(**new_factura.model_dump())
+        return FacturaResponse.model_validate(f.to_response())
 
-    async def get_all_facturas(self, fecha: Optional[date] = None, cliente_id: Optional[int] = None, estado: Optional[str] = None) -> List[FacturaResponse]:
-        # HU-XXX: Listar Facturas - Filtrar por fecha, cliente o estado
-        facturas_in_db = await self.factura_repository.get_all_facturas(fecha, cliente_id, estado)
-        return [FacturaResponse(**factura.model_dump()) for factura in facturas_in_db]
+    def listar(self) -> list[FacturaListItem]:
+        """Lista todas las facturas registradas."""
+        facturas = self.repo.obtener_todos()
+        if not facturas:
+            raise ValueError("No hay facturas registradas")
+        return [FacturaListItem(**f.to_list_item()) for f in facturas]
 
-    async def delete_factura(self, factura_id: int) -> bool:
-        # HU-XXX: Eliminar Factura - No permitir eliminar factura pagada
-        factura = await self.factura_repository.get_factura_by_id(factura_id)
+    def eliminar(self, id: int) -> dict:
+        """
+        Elimina una factura solo si está en estado pendiente.
+        - 404 si no existe
+        - 403 si ya fue pagada
+        """
+        factura = self.repo.obtener_por_id(id)
+
         if not factura:
-            return False # Factura no existe
-        if factura.estado == "pagada": # Asumiendo que existe un estado 'pagada'
-            return False # No se puede eliminar una factura ya pagada
-        
-        return await self.factura_repository.delete_factura(factura_id)
+            raise ValueError("La factura no existe")
+
+        if factura.estado == "pagada":
+            raise PermissionError("No se puede eliminar una factura ya pagada")
+
+        self.repo.eliminar(id)
+        return {
+            "codigo": 200,
+            "mensaje": "Factura eliminada exitosamente"
+        }
+
+
+# ── INSTANCIA GLOBAL ──────────────────────────────────────────
+facturas_service = FacturasServices(factura_repository)
