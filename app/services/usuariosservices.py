@@ -1,6 +1,5 @@
-from app.domain.usuariosdomain import UsuarioCreate, UsuarioResponse
+from app.domain.usuariosdomain import UsuarioCreate, UsuarioResponse, UsuarioListItem
 from app.repositories.usuariosrepositories import UsuariosRepositories
-from app.core.usuarioscore import obtener_hash_contrasena
 
 
 class UsuariosServices:
@@ -9,20 +8,29 @@ class UsuariosServices:
         self.repo = repo
 
     def registrar(self, datos: UsuarioCreate) -> UsuarioResponse:
-        if self.repo.obtener_por_correo(datos.correo):
-            raise ValueError("El correo ya está registrado")
+        existente = self.repo.obtener_por_correo(datos.correo)
+        if existente:
+            raise ValueError("El correo ya esta registrado")
 
-        # Hashear antes de guardar
-        hashed_pw = obtener_hash_contrasena(datos.contrasena)
-        
         u = self.repo.crear(
-            nombre=datos.nombre,
-            correo=datos.correo,
-            contrasena=hashed_pw,
-            rol=datos.rol or "cliente"
+            nombre     = datos.nombre,
+            correo     = datos.correo,
+            contrasena = datos.contrasena,
+            rol        = datos.rol,
         )
-        return UsuarioResponse.model_validate(u.to_response())
-    
+        return UsuarioResponse(**u.to_response())
+
+    def listar(self, rol: str = None) -> list[UsuarioListItem]:
+        if rol:
+            usuarios = self.repo.obtener_por_rol(rol)
+        else:
+            usuarios = self.repo.obtener_todos()
+
+        if not usuarios:
+            raise ValueError("No hay usuarios registrados")
+
+        return [UsuarioListItem(**u.to_list_item()) for u in usuarios]
+
 
 from app.repositories.usuariosrepositories import usuario_repository
 usuarios_service = UsuariosServices(usuario_repository)
