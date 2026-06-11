@@ -35,7 +35,18 @@ class UsuariosRepositories:
         self._datos.append(nuevo)
         self._siguiente_id += 1
         return nuevo
+    def eliminar(self, id: int) -> bool:
+        usuario = self.obtener_por_id(id)
+        if not usuario:
+            return False
+        self._datos.remove(usuario)
+        return True
+
+    def obtener_por_id(self, id: int) -> Optional[UsuarioEntidad]:
+        return next((u for u in self._datos if u.id == id), None)
+
 
 
 # Instancia única compartida
 usuario_repository = UsuariosRepositories()
+
