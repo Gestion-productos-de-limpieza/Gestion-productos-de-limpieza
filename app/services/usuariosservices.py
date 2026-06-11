@@ -1,10 +1,4 @@
-# ─────────────────────────────────────────────────────────────
-# CAPA SERVICIO — orquesta dominio + repositorio
-# Contiene las reglas de negocio y el flujo.
-# No importa nada de FastAPI aquí.
-# ─────────────────────────────────────────────────────────────
-
-from app.domain.usuariosdomain import UsuarioCreate, UsuarioResponse
+from app.domain.usuariosdomain import UsuarioCreate, UsuarioResponse, UsuarioListItem
 from app.repositories.usuariosrepositories import UsuariosRepositories
 
 
@@ -14,10 +8,9 @@ class UsuariosServices:
         self.repo = repo
 
     def registrar(self, datos: UsuarioCreate) -> UsuarioResponse:
-        # Verificar correo duplicado
         existente = self.repo.obtener_por_correo(datos.correo)
         if existente:
-            raise ValueError("El correo ya está registrado")
+            raise ValueError("El correo ya esta registrado")
 
         u = self.repo.crear(
             nombre     = datos.nombre,
@@ -27,7 +20,17 @@ class UsuariosServices:
         )
         return UsuarioResponse(**u.to_response())
 
+    def listar(self, rol: str = None) -> list[UsuarioListItem]:
+        if rol:
+            usuarios = self.repo.obtener_por_rol(rol)
+        else:
+            usuarios = self.repo.obtener_todos()
 
-# Instancia única compartida
+        if not usuarios:
+            raise ValueError("No hay usuarios registrados")
+
+        return [UsuarioListItem(**u.to_list_item()) for u in usuarios]
+
+
 from app.repositories.usuariosrepositories import usuario_repository
 usuarios_service = UsuariosServices(usuario_repository)

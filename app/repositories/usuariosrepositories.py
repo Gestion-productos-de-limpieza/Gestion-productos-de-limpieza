@@ -1,8 +1,3 @@
-# ─────────────────────────────────────────────────────────────
-# CAPA REPOSITORIO — única responsabilidad: guardar y recuperar
-# Solo manipula datos. Sin lógica de negocio aquí.
-# ─────────────────────────────────────────────────────────────
-
 from app.domain.usuariosdomain import Usuario
 from typing import Optional
 
@@ -23,6 +18,9 @@ class UsuariosRepositories:
         return next((u for u in self._datos
                      if u.correo.lower() == correo.lower()), None)
 
+    def obtener_por_rol(self, rol: str) -> list[Usuario]:
+        return [u for u in self._datos if u.rol.lower() == rol.lower()]
+
     def crear(self, nombre: str, correo: str,
               contrasena: str, rol: str) -> Usuario:
         nuevo = Usuario(
@@ -37,5 +35,4 @@ class UsuariosRepositories:
         return nuevo
 
 
-# Instancia única compartida
 usuario_repository = UsuariosRepositories()
