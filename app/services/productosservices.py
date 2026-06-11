@@ -1,4 +1,4 @@
-from app.domain.productosdomain import ProductoCreate, ProductoResponse
+﻿from app.domain.productosdomain import ProductoCreate, ProductoResponse
 from app.repositories.productosrepositories import ProductosRepositories
 
 
@@ -8,8 +8,10 @@ class ProductosServices:
         self.repo = repo
 
     def listar(self) -> list[ProductoResponse]:
-        return [ProductoResponse(**p.to_response())
-                for p in self.repo.obtener_todos()]
+        productos = self.repo.obtener_todos()
+        if not productos:
+            raise ValueError("No hay productos registrados")
+        return [ProductoResponse(**p.to_response()) for p in productos]
 
     def obtener(self, id: int) -> ProductoResponse:
         p = self.repo.obtener_por_id(id)
@@ -53,3 +55,4 @@ class ProductosServices:
 
 from app.repositories.productosrepositories import producto_repository
 productos_service = ProductosServices(producto_repository)
+
