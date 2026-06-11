@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.api.productosapi import router as productos_router
-from app.api.usuariosapi import router as usuarios_router  # ← agregar
+from app.api.usuariosapi import router as usuarios_router
+from app.api.descuentosapi import router as descuentos_router
 
 app = FastAPI(
     title="Gestion-productos-de-limpieza",
@@ -8,7 +9,8 @@ app = FastAPI(
 )
 
 app.include_router(productos_router)
-app.include_router(usuarios_router)  # ← agregar
+app.include_router(usuarios_router)
+app.include_router(descuentos_router)
 
 @app.get("/")
 def root():
