@@ -42,8 +42,9 @@ class UsuariosRepositories:
         self._datos.remove(usuario)
         return True
 
-    def obtener_por_id(self, id: int) -> Optional[UsuarioEntidad]:
-        return next((u for u in self._datos if u.id == id), None)
+    def obtener_todos(self) -> list[UsuarioEntidad]:
+        return self._datos.copy()
+
 
 
 
